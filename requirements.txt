@@ -1,0 +1,21 @@
+# web & server
+flask
+gunicorn
+
+# cloud SDKs
+oss2
+tablestore>=5.7.0
+
+# vision/model
+numpy
+pillow
+opencv-python-headless
+
+# Ultralytics YOLO（会依赖 torch）
+ultralytics
+
+# user auth
+supervision==0.20.0
+Flask-Login
+aliyun-python-sdk-core
+aliyun-python-sdk-ram

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# venv
+.venv/
+.venv-*/
+
+# 大文件与本地数据
+local_store/
+uploads/
+thumbs/
+previews/
+*.zip
+*.tar
+*.tar.gz
+
+# 其它不需要的目录
+BirdNET-Analyzer/

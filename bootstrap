@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+export FC_SERVER_PORT="${FC_SERVER_PORT:-9000}"
+
+exec gunicorn app:app \
+  -b 0.0.0.0:${FC_SERVER_PORT} \
+  -w 1 --threads 1 \
+  --timeout 300 --graceful-timeout 300 \
+  --keep-alive 5

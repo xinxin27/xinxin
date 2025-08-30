@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monash Birdy Buddies</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        h1, h2 { color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .upload-section, .query-section, .results-section { margin-bottom: 20px; }
+        input[type="file"], input[type="text"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+        .result-item { border: 1px solid #ddd; border-radius: 4px; padding: 10px; background: #fafafa; }
+        .result-item img { max-width: 100%; border-radius: 4px; }
+        .result-item p { font-size: 12px; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Monash Birdy Buddies</h1>
+        
+        <div class="upload-section">
+            <h2>Upload Media</h2>
+            <input type="file" id="fileInput" multiple>
+            <button onclick="uploadFiles()">Upload</button>
+        </div>
+
+        <div class="query-section">
+            <h2>Query Files</h2>
+            <input type="text" id="queryInput" placeholder="e.g., {'crow': 1}">
+            <button onclick="queryFiles()">Search by Tags</button>
+        </div>
+
+        <div class="results-section">
+            <h2>Results</h2>
+            <div id="results" class="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // In a real application, you would replace this with your actual API Gateway endpoint
+        const API_ENDPOINT = ''; 
+
+        function uploadFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+            if (files.length === 0) {
+                alert('Please select files to upload.');
+                return;
+            }
+
+            // This is a placeholder for the upload logic.
+            // In a real implementation, you would use the Alibaba Cloud OSS SDK for JavaScript
+            // to upload files directly to the OSS bucket from the browser.
+            // This is more efficient and secure than sending files through your backend.
+            alert(`Simulating upload for ${files.length} files. In a real app, this would use the OSS SDK.`);
+            console.log('Files to upload:', files);
+        }
+
+        async function queryFiles() {
+            const queryInput = document.getElementById('queryInput').value;
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = 'Loading...';
+
+            let query;
+            try {
+                query = JSON.parse(queryInput);
+            } catch (e) {
+                alert('Invalid JSON query format.');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+
+            if (!API_ENDPOINT) {
+                alert('API_ENDPOINT is not configured. Please set it in the script.');
+                resultsDiv.innerHTML = 'API endpoint not configured.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_ENDPOINT}/search`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ min: query })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data.items);
+
+            } catch (error) {
+                console.error('Error querying files:', error);
+                resultsDiv.innerHTML = 'Failed to fetch results.';
+            }
+        }
+
+        function displayResults(items) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            if (items.length === 0) {
+                resultsDiv.innerHTML = 'No results found.';
+                return;
+            }
+
+            items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'result-item';
+
+                let content = '';
+                if (item.thumbUrl) {
+                    // Assuming thumbUrl is a direct link or can be converted to one.
+                    // For OSS, you might need to generate a signed URL.
+                    content += `<img src="${item.thumbUrl.replace('oss://' + BUCKET_NAME, 'https://' + BUCKET_NAME + '.' + OSS_REGION + '.aliyuncs.com')}" alt="thumbnail">`;
+                }
+                content += `<p><strong>File:</strong> ${item.fileKey}</p>`;
+                if (item.speciesCounts) {
+                    content += `<p><strong>Tags:</strong> ${JSON.stringify(item.speciesCounts)}</p>`;
+                }
+                
+                itemDiv.innerHTML = content;
+                resultsDiv.appendChild(itemDiv);
+            });
+        }
+
+        // You would need to configure these values for your environment
+        const BUCKET_NAME = 'your-bucket-name';
+        const OSS_REGION = 'your-oss-region';
+
+    </script>
+</body>
+</html>

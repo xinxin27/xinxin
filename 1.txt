@@ -1,0 +1,164 @@
+1 Background
+Monash Birdy Buddies (MBB) is a group of researchers, students, and staff w ho l ove e verything about
+birds at Monash University. MBB is all about exploring the amazing world of birds – from the tiniest
+wrens hopping in the bush to the majestic raptors soaring overhead. During the past few years, MBB has
+expanded its operations and membership to multiple Monash campuses in many countries.
+Think about all the fantastic stuff MBB c aptures: t hose s tunning s hots of birds i n a ction, t he unique
+calls and songs recorded, and those hilarious or insightful video clips of behaviour. This is the gold mine for
+bird research! It’s how MBB identify species, tracks individuals, studies behaviour, monitors populations,
+and ultimately, figures o ut h ow t o h elp p rotect o ur f eathered f riends. B ut r ight n ow, i magine t rying to
+find t hat s pecific ph oto of th e ra re bi rd fr om la st ye ar if it ’s bu ried on so meone’s ra ndom ha rd dr ive, or
+losing a whole batch of important audio recordings because a memory card got corrupted. Data scattered
+everywhere is data that’s hard to use, easy to lose, and impossible to share properly.
+A good storage system means everything is safe, backed up, and organised in one central location. It
+means any MBB member who needs data can find i t e fficiently. Col laborating on pro jects is a breeze
+because we all look at the same organised data. It ensures the valuable information we collect isn’t lost,
+allowing us to build on our work over time and contribute robust findings to bird conservation and science.
+It’s the essential nest that keeps all our precious bird observations secure and accessible, allowing us to
+spend less time searching and stressing and more time doing the awesome work of understanding and
+helping our avian pals!
+This assignment aims to build an Alibaba Cloud-based online storage system that allows users to store, organise
+and retrieve media files based on auto-generated and manual tags. The focus of this project is to design a
+serverless application that enables clients to upload their media files (images, audios and videos) to public
+cloud storage. Upon upload, the application automatically tags the file with the bird species detected in
+it, automatically sorts/moves the file to the corresponding directory and adds a record in a database for
+searching. Later, files can also be queried based on the bird species in them.
+2 Group Assignment
+Most software developers will work in a team at some point in their career. Therefore, this assignment is
+designed as a group project to prepare students to experience software development as a team. Students
+will be placed into software teams of up to four members to work on implementing the system described
+above. In this assignment, students need to organise their teams and collective involvement. There is no
+designated team leader, but teams may decide to establish processes for agreeing on work distribution.
+Understanding the dependencies between individual efforts and their successful integration is crucial to the
+success of the work and for software engineering projects in general. If teams encounter any “issues”, they
+should inform the teaching team as soon as possible, and help will be provided to resolve them. The due
+1
+date for this assignment is firm, and there is no ’special consideration’ for granting an extension.
+If a team member fails to complete their work for any reason, other team members should handle their
+tasks and report this to the teaching team as soon as possible. We will evaluate individual involvement in
+the project. If a team member fails to satisfy their tasks, they may be penalised heavily, regardless of the
+project’s success.
+2.1 Assignment Description
+Teams should develop an Alibaba Cloud-based solution that leverages services such as OSS, Function Compute, API Gateway,
+and database services (e.g., Tablestore) to build a system for automated bird tagging (pretrained models
+and sample code are provided) and query handling. The teams should produce a solution that enables
+end-users to upload their files into an OSS bucket. Upon uploading a file to a designated OSS bucket, a Function Compute
+function is automatically triggered, which uses the pretrained model to identify the bird in the file and
+stores the list of detected birds along with the file’s OSS URL in a database. Furthermore, the end-user
+should be able to submit queries to an API endpoint using API Gateway to search for tagged files (more
+details to come).
+3 Authentication and Authorisation (10%)
+Security is one of the most crucial aspects of developing cloud applications. When your application is
+publicly exposed, you must ensure that your endpoints and resources are safeguarded against unauthorised
+access and malicious requests. Alibaba Cloud, through its IDaaS (Identity as a Service) or RAM (Resource Access Management) service, provides a straightforward, secure, and
+centralised approach to protect your web application and its various resources from unauthorised access.
+To leverage the Alibaba Cloud IDaaS or RAM service, you first need to create a user pool that stores user credentials. Then,
+you need to create and configure a client app that provides access to your application and/or other Alibaba Cloud
+services to query and use the user pool. Finally, you have options to communicate with the Alibaba Cloud IDaaS or RAM
+service and perform authentication and/or authorisation. You can use the Alibaba Cloud Python SDK
+to access the user pool and identity provider(s) that you have defined earlier.
+Your application should support the following workflow and features:
+• Detect whether a user is authenticated or not. If the user has not signed in, access to all pages or
+endpoints except the sign-up service needs to be blocked, and the user should be redirected to the
+sign-up page to register a new account. For each new account, you need to record the user’s email
+address, first name, last name, and password. IDaaS or RAM will take care of sending an email to new
+users, asking them to verify their email address and change their temporary password.
+• Your application should include a login page that allows users to sign in. After successful authentication, users should be able to upload files, submit queries, view query results, and sign out of the
+application. All of these services must be protected against unauthorised access.
+• You can implement login and sign-up web pages using either the Hosted UI feature of IDaaS or
+your own version that calls IDaaS/RAM APIs.
+• Uploading files to an OSS bucket, invoking Function Compute functions to execute the business logic of your
+application, and accessing the database for data storage and retrieval all require fine-grained access
+control permissions that you need to set up via RAM roles and appropriate policies. It is important
+to note that RAM roles in Alibaba Cloud Academy have several limitations. Therefore, you should carefully
+consider how to perform authentication and authorisation in your system while considering these
+limitations.
+2
+4 Core Functionalities (50%)
+4.1 Model Handling
+Machine learning and deep learning models are often updated to improve their quality. If MBB provide
+a new version of the model to you, your solution design should be flexible enough to use the new model
+without changing your source code/Function Compute function.
+4.2 File Handling (20%)
+Your solution should provide a mechanism to upload a file to an OSS bucket. Uploading a file to an OSS
+bucket can be done either through an API Gateway endpoint (using POST REST APIs) or directly using
+Alibaba Cloud SDKs (for instance, oss2 if you are using Python). Whenever a file is uploaded to the OSS bucket,
+your system must trigger an event and invoke a Function Compute function.
+• Building Images Thumbnails: Upon uploading an image to OSS, a Function Compute function should make
+a thumbnail for that image. Creating a thumbnail for an image involves resizing the original image
+to a smaller dimension while maintaining its aspect ratio, followed by compression to reduce file size.
+You can use OpenCV library for this purpose. You are expected to configure the triggers and grant
+the required Alibaba Cloud resource permissions (execution roles) for the Function Compute function.
+• Tagging Files: Another Function Compute function should be triggered to read the uploaded file, detect birds
+in the images/audios/videos, and save the file type and a list of detected bird species (tags) along
+with the OSS URLs for that file and its thumbnail (in case of image) in an Alibaba Cloud database for future
+queries.
+4.3 Queries (25%)
+Your solution should provide APIs that allow the following queries:
+• Find images and videos based on the tags: The user can send a JSON-based query to request URLs
+of files that contain specific tags with a species of bird and minimum counts (e.g., {”crow”: 3},
+{“pigeon”: 2, ”crow”: 1}, which shows all files with ≥ 3 crows in the first case and ≥ 2 pigeon AND
+≥ 1 crow in the second example). You are expected to create an API Gateway with a RESTful API
+allowing users to submit their requests, such as GET or POST. Your application might send a list
+of tags via specific GET parameters in the requested URL, for example:
+https://xxx.cn-hangzhou.aliyuncs.com/dev/search?tag1=crow&count1=1&tag2=pigeon&count2=2
+or it can be a POST request with a JSON object including a list of tags and their counts. A response
+should include the list of URLs to all thumbnails of images and full URLs for videos that contain all
+the requested tags in the query. This can be a JSON message similar to the following:
+{
+"links": [
+"https://xxx.oss-cn-hangzhou.aliyuncs.com/bird1-thumb.png",
+"https://xxx.oss-cn-hangzhou.aliyuncs.com/bird59-thumb.png",
+"https://xxx.oss-cn-hangzhou.aliyuncs.com/bird180-thumb.png"
+]
+}
+Your query may require triggering one or more Function Compute function that receives a list of tags from
+the database, i.e., logical AND operation, not OR operation between tags. In your UI, instead of
+3
+showing the oss-urls of thumbnails you can preview the thumbnails found as the results. The user can
+request the full-size image by clicking on the thumbnails or sending another query to get the full-size
+image. In case of video files, show a link to allow the user to download the files.
+• Find files based on bird species: User can send a a request similar to previous query without
+count, e.g. {”crow”}, your application will return all images, audios and videos contain at least one
+crow.
+• Find files based on the thumbnail’s URL: Users can input the oss-url of a thumbnail into the
+system and receive the corresponding full-size image oss-url.
+• Find files based on the tags of a file: The user can send a file as part of an API call. The list
+of all birds (tags) in the sent file is discovered and then all the files in the bucket containing those
+set of tags are found. Finally, as a response, the list of oss-URLs of the matching images thumbnails
+or audio/video files (similar to to the previous section) are returned to the user. You should ensure
+that the file uploaded for the query purpose is not added to the database or stored in oss.
+• Manual addition or removal of tags with bulk tagging: Your solution should also provide an
+API that allows end-users to add or remove tags from files. You are expected to create a POST API
+that enables users to submit their requests. A sample JSON message sent to add/remove tags is:
+{
+"url": [
+"https://xxx.oss-cn-hangzhou.aliyuncs.com/image1-thumb.png",
+"https://xxx.oss-cn-hangzhou.aliyuncs.com/image60-thumb.png",
+"https://xxx.oss-cn-hangzhou.aliyuncs.com/image23-thumb.png",
+]
+"operation": 1, /* 1 for add and 0 for remove */
+"tags": [
+"crow,1",
+"pigeon,2"
+]
+}
+“operation” can be set to 1 or 0 for adding or removing a tag, respectively. The above request adds
+1 ”crow” and 2 ”pigeon” tags to the tag list of the files in the list of URLs. If “operation” is set to 0,
+the tags are removed from the tag list of the file. If a tag is not included in the list of tags requested
+for deletion, you can simply ignore it in the request.
+• Delete files: The user can send a list of URLs to an API, and the system should remove the files
+and their thumbnails (in case of images) from OSS, and all relevant entries from the database.
+4.4 Tag-based Notifications (5%)
+Users can receive email notifications or updates related to files based on specific tags. For example, users
+can receive notifications when new images with specific birds are added or updated to the system. You
+can use Alibaba Cloud MNS (Message Service) or DirectMail for this purpose.
+4
+5 User Interface (15%)
+You can design a simple user interface (UI) (We suggest web-based GUI). But UI can be of any form that
+includes the following: upload files, submit queries, and view query results. A UI makes your system easier
+and more enjoyable to use. However, you have the option not to create a UI for application or have UI
+for some parts and not the others. If you opt to ignore UI or full-fledged UI, you can write scripts (e.g.,
+Python) to handle communications with your application APIs. Please be aware that you might need to
+manually copy credentials provided by the identity pool to your scripts each time if you choose to work
+with the latter option.
